@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Skill(developing-gtkx-apps)"
+      "Skill(developing-gtkx-apps)",
+      "WebSearch",
+      "WebFetch(domain:tanstack.com)",
+      "Bash(cat:*)"
     ]
   }
 }

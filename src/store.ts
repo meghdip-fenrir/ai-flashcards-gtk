@@ -1,19 +1,16 @@
 import { atom } from "jotai";
-import type { Flashcard, Rating } from "./types";
+import type { Flashcard, Rating } from "./types.js";
+import { loadFlashcards, saveFlashcards, type FlashcardData } from "./storage.js";
+import { generateFlashcards } from "./agent.js";
 
-const initialCards: Flashcard[] = [
-    { id: 1, front: "What is the capital of France?", back: "Paris", ease: 2.5, reviews: 0 },
-    { id: 2, front: "What is 2 + 2?", back: "4", ease: 2.5, reviews: 0 },
-    { id: 3, front: "What programming language is React written in?", back: "JavaScript", ease: 2.5, reviews: 0 },
-    { id: 4, front: "What year did World War II end?", back: "1945", ease: 2.5, reviews: 0 },
-    { id: 5, front: "What is the chemical symbol for water?", back: "H2O", ease: 2.5, reviews: 0 },
-    { id: 6, front: "Who painted the Mona Lisa?", back: "Leonardo da Vinci", ease: 2.5, reviews: 0 },
-    { id: 7, front: "What is the largest planet in our solar system?", back: "Jupiter", ease: 2.5, reviews: 0 },
-    { id: 8, front: "What is the square root of 144?", back: "12", ease: 2.5, reviews: 0 },
-];
+// Load initial data from storage or use empty array
+const storedData = loadFlashcards();
+const initialCards: Flashcard[] = storedData?.cards ?? [];
+const initialTopic: string | undefined = storedData?.topic;
 
 // Base atoms
 export const cardsAtom = atom<Flashcard[]>(initialCards);
+export const topicAtom = atom<string | undefined>(initialTopic);
 export const currentIndexAtom = atom(0);
 export const isFlippedAtom = atom(false);
 export const reviewedCountAtom = atom(0);
@@ -26,6 +23,11 @@ export const currentCardAtom = atom((get) => {
 });
 
 export const totalCardsAtom = atom((get) => get(cardsAtom).length);
+export const hasCardsAtom = atom((get) => get(cardsAtom).length > 0);
+
+// AI generation state atoms
+export const isGeneratingAtom = atom(false);
+export const generationErrorAtom = atom<string | null>(null);
 
 // Action atoms
 export const flipCardAtom = atom(null, (get, set) => {
@@ -56,21 +58,32 @@ const easeModifiers: Record<Rating, number> = {
     easy: 0.15,
 };
 
+// Helper to persist cards
+function persistCards(cards: Flashcard[], topic?: string): void {
+    saveFlashcards({
+        cards,
+        topic,
+        lastUpdated: new Date().toISOString(),
+    });
+}
+
 export const rateCardAtom = atom(null, (get, set, rating: Rating) => {
     const currentIndex = get(currentIndexAtom);
     const totalCards = get(totalCardsAtom);
+    const topic = get(topicAtom);
 
-    set(cardsAtom, (prevCards) =>
-        prevCards.map((card, idx) =>
-            idx === currentIndex
-                ? {
-                      ...card,
-                      ease: Math.max(1.3, card.ease + easeModifiers[rating]),
-                      reviews: card.reviews + 1,
-                  }
-                : card
-        )
+    const updatedCards = get(cardsAtom).map((card, idx) =>
+        idx === currentIndex
+            ? {
+                  ...card,
+                  ease: Math.max(1.3, card.ease + easeModifiers[rating]),
+                  reviews: card.reviews + 1,
+              }
+            : card
     );
+
+    set(cardsAtom, updatedCards);
+    persistCards(updatedCards, topic);
 
     set(reviewedCountAtom, (c) => c + 1);
 
@@ -80,4 +93,70 @@ export const rateCardAtom = atom(null, (get, set, rating: Rating) => {
         set(currentIndexAtom, 0);
     }
     set(isFlippedAtom, false);
+});
+
+// AI generation action atoms
+export const generateFromTopicAtom = atom(
+    null,
+    async (get, set, topic: string, count: number = 5) => {
+        set(isGeneratingAtom, true);
+        set(generationErrorAtom, null);
+
+        try {
+            const newCards = await generateFlashcards({ topic, count });
+            set(cardsAtom, newCards);
+            set(topicAtom, topic);
+            set(currentIndexAtom, 0);
+            set(isFlippedAtom, false);
+            set(reviewedCountAtom, 0);
+            persistCards(newCards, topic);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to generate cards";
+            set(generationErrorAtom, message);
+            throw error;
+        } finally {
+            set(isGeneratingAtom, false);
+        }
+    }
+);
+
+export const generateMoreCardsAtom = atom(
+    null,
+    async (get, set, count: number = 5) => {
+        const existingCards = get(cardsAtom);
+        const topic = get(topicAtom);
+
+        if (existingCards.length === 0) {
+            throw new Error("No existing cards to base generation on");
+        }
+
+        set(isGeneratingAtom, true);
+        set(generationErrorAtom, null);
+
+        try {
+            const newCards = await generateFlashcards({
+                existingCards,
+                count,
+            });
+            const allCards = [...existingCards, ...newCards];
+            set(cardsAtom, allCards);
+            persistCards(allCards, topic);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to generate cards";
+            set(generationErrorAtom, message);
+            throw error;
+        } finally {
+            set(isGeneratingAtom, false);
+        }
+    }
+);
+
+// Clear all cards and start fresh
+export const clearCardsAtom = atom(null, (get, set) => {
+    set(cardsAtom, []);
+    set(topicAtom, undefined);
+    set(currentIndexAtom, 0);
+    set(isFlippedAtom, false);
+    set(reviewedCountAtom, 0);
+    persistCards([], undefined);
 });

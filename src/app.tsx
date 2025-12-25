@@ -1,15 +1,34 @@
 import * as Gtk from "@gtkx/ffi/gtk";
 import { ApplicationWindow, Box, quit } from "@gtkx/react";
+import { useAtomValue } from "jotai";
+import { hasCardsAtom } from "./store.js";
 import { NavigationBar } from "./components/NavigationBar.js";
 import { FlashcardView } from "./components/FlashcardView.js";
 import { ActionButtons } from "./components/ActionButtons.js";
+import { TopicInput } from "./components/TopicInput.js";
+
+function MainContent() {
+  const hasCards = useAtomValue(hasCardsAtom);
+
+  if (!hasCards) {
+    return <TopicInput />;
+  }
+
+  return (
+    <>
+      <NavigationBar />
+      <FlashcardView />
+      <ActionButtons />
+    </>
+  );
+}
 
 export default function App() {
   return (
     <ApplicationWindow
-      title="Anki Flashcards"
-      defaultWidth={500}
-      defaultHeight={450}
+      title="AI Flashcards"
+      defaultWidth={550}
+      defaultHeight={500}
       onCloseRequest={quit}
     >
       <Box
@@ -20,9 +39,7 @@ export default function App() {
         marginStart={24}
         marginEnd={24}
       >
-        <NavigationBar />
-        <FlashcardView />
-        <ActionButtons />
+        <MainContent />
       </Box>
     </ApplicationWindow>
   );

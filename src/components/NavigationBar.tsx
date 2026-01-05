@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import * as Gtk from "@gtkx/ffi/gtk";
-import { Box, Button, Label } from "@gtkx/react";
+import { GtkBox, GtkButton, GtkLabel } from "@gtkx/react";
 import {
   currentIndexAtom,
   totalCardsAtom,
@@ -20,35 +20,35 @@ export function NavigationBar() {
   const prevCard = useSetAtom(prevCardAtom);
 
   return (
-    <Box orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+    <GtkBox orientation={Gtk.Orientation.VERTICAL} spacing={8}>
       {topic && (
-        <Label
+        <GtkLabel
           label={topic}
           cssClasses={["title-4"]}
           halign={Gtk.Align.CENTER}
         />
       )}
-      <Box orientation={Gtk.Orientation.HORIZONTAL} spacing={12}>
-        <Button
+      <GtkBox orientation={Gtk.Orientation.HORIZONTAL} spacing={12}>
+        <GtkButton
           iconName="go-previous-symbolic"
           onClicked={prevCard}
           sensitive={currentIndex > 0}
           tooltipText="Previous card"
         />
-        <Label
+        <GtkLabel
           label={`Card ${currentIndex + 1} of ${totalCards} | Reviewed: ${reviewedCount}`}
           hexpand
           halign={Gtk.Align.CENTER}
           cssClasses={["dim-label"]}
         />
-        <Button
+        <GtkButton
           iconName="go-next-symbolic"
           onClicked={nextCard}
           sensitive={currentIndex < totalCards - 1}
           tooltipText="Next card"
         />
         <GenerateButton />
-      </Box>
-    </Box>
+      </GtkBox>
+    </GtkBox>
   );
 }

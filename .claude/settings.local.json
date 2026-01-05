@@ -4,7 +4,8 @@
       "Skill(developing-gtkx-apps)",
       "WebSearch",
       "WebFetch(domain:tanstack.com)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(bun run build:*)"
     ]
   }
 }

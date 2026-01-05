@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import * as Gtk from "@gtkx/ffi/gtk";
-import { Box, Label, Stack } from "@gtkx/react";
+import { GtkBox, GtkLabel, GtkStack, StackPage } from "@gtkx/react";
 import { currentCardAtom, isFlippedAtom } from "../store.js";
 
 export function FlashcardView() {
@@ -8,16 +8,16 @@ export function FlashcardView() {
   const isFlipped = useAtomValue(isFlippedAtom);
 
   return (
-    <Box
+    <GtkBox
       orientation={Gtk.Orientation.VERTICAL}
       spacing={12}
       vexpand
       hexpand
       cssClasses={["card"]}
     >
-      <Stack.Root visibleChildName={isFlipped ? "back" : "front"} vexpand>
-        <Stack.Page name="front" title="Question">
-          <Box
+      <GtkStack visibleChildName={isFlipped ? "back" : "front"} vexpand>
+        <StackPage name="front" title="Question">
+          <GtkBox
             orientation={Gtk.Orientation.VERTICAL}
             valign={Gtk.Align.CENTER}
             halign={Gtk.Align.CENTER}
@@ -25,17 +25,17 @@ export function FlashcardView() {
             hexpand
             spacing={16}
           >
-            <Label label="Question" cssClasses={["dim-label", "caption"]} />
-            <Label
+            <GtkLabel label="Question" cssClasses={["dim-label", "caption"]} />
+            <GtkLabel
               label={currentCard.front}
               wrap
               justify={Gtk.Justification.CENTER}
               cssClasses={["title-2"]}
             />
-          </Box>
-        </Stack.Page>
-        <Stack.Page name="back" title="Answer">
-          <Box
+          </GtkBox>
+        </StackPage>
+        <StackPage name="back" title="Answer">
+          <GtkBox
             orientation={Gtk.Orientation.VERTICAL}
             valign={Gtk.Align.CENTER}
             halign={Gtk.Align.CENTER}
@@ -43,16 +43,16 @@ export function FlashcardView() {
             hexpand
             spacing={16}
           >
-            <Label label="Answer" cssClasses={["dim-label", "caption"]} />
-            <Label
+            <GtkLabel label="Answer" cssClasses={["dim-label", "caption"]} />
+            <GtkLabel
               label={currentCard.back}
               wrap
               justify={Gtk.Justification.CENTER}
               cssClasses={["title-1"]}
             />
-          </Box>
-        </Stack.Page>
-      </Stack.Root>
-    </Box>
+          </GtkBox>
+        </StackPage>
+      </GtkStack>
+    </GtkBox>
   );
 }

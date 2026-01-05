@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import * as Gtk from "@gtkx/ffi/gtk";
-import { Box, Button, Label } from "@gtkx/react";
+import { GtkBox, GtkButton, GtkLabel } from "@gtkx/react";
 import {
     generateMoreCardsAtom,
     isGeneratingAtom,
@@ -23,26 +23,26 @@ export function GenerateButton() {
     };
 
     return (
-        <Box orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
+        <GtkBox orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
             {error && (
-                <Label
+                <GtkLabel
                     label={error}
                     cssClasses={["error", "caption"]}
                     halign={Gtk.Align.START}
                 />
             )}
-            <Button
+            <GtkButton
                 iconName="view-refresh-symbolic"
                 tooltipText="Generate more cards based on weak areas"
-                onClicked={handleGenerateMore}
+                onClicked={() => { handleGenerateMore(); }}
                 sensitive={!isGenerating}
             />
-            <Button
+            <GtkButton
                 iconName="edit-clear-all-symbolic"
                 tooltipText="Start over with a new topic"
                 onClicked={clearCards}
                 sensitive={!isGenerating}
             />
-        </Box>
+        </GtkBox>
     );
 }

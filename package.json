@@ -12,21 +12,25 @@
     "appId": "com.meghdip.aidemo"
   },
   "dependencies": {
-    "@gtkx/css": "^0.9.4",
-    "@gtkx/ffi": "^0.9.4",
-    "@gtkx/react": "^0.9.4",
+    "@gtkx/css": "^0.12.0",
+    "@gtkx/ffi": "^0.12.0",
+    "@gtkx/react": "^0.12.0",
     "@tanstack/ai": "^0.2.0",
     "@tanstack/ai-anthropic": "^0.2.0",
     "@tanstack/ai-react": "^0.2.0",
-    "@tanstack/react-query": "^5.90.12",
-    "jotai": "^2.16.0",
+    "@tanstack/react-query": "^5.90.16",
+    "drizzle-orm": "^0.45.1",
+    "jotai": "^2.16.1",
     "react": "^19.2.3",
-    "zod": "^4.2.1"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@gtkx/cli": "^0.9.4",
+    "@gtkx/cli": "^0.12.0",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "typescript": "^5.9.3"
-  }
+  },
+  "trustedDependencies": [
+    "@swc/core"
+  ]
 }

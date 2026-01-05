@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import * as Gtk from "@gtkx/ffi/gtk";
-import { Box, Button } from "@gtkx/react";
+import { GtkBox, GtkButton } from "@gtkx/react";
 import { isFlippedAtom, flipCardAtom, rateCardAtom } from "../store.js";
 
 export function ActionButtons() {
@@ -10,7 +10,7 @@ export function ActionButtons() {
 
   if (!isFlipped) {
     return (
-      <Button
+      <GtkButton
         label="Show Answer"
         onClicked={flipCard}
         cssClasses={["suggested-action", "pill"]}
@@ -20,34 +20,34 @@ export function ActionButtons() {
   }
 
   return (
-    <Box
+    <GtkBox
       orientation={Gtk.Orientation.HORIZONTAL}
       spacing={8}
       halign={Gtk.Align.CENTER}
       homogeneous
     >
-      <Button
+      <GtkButton
         label="Again"
         onClicked={() => rateCard("again")}
         cssClasses={["destructive-action"]}
         tooltipText="Completely forgot"
       />
-      <Button
+      <GtkButton
         label="Hard"
         onClicked={() => rateCard("hard")}
         tooltipText="Recalled with difficulty"
       />
-      <Button
+      <GtkButton
         label="Good"
         onClicked={() => rateCard("good")}
         tooltipText="Recalled correctly"
       />
-      <Button
+      <GtkButton
         label="Easy"
         onClicked={() => rateCard("easy")}
         cssClasses={["suggested-action"]}
         tooltipText="Very easy"
       />
-    </Box>
+    </GtkBox>
   );
 }

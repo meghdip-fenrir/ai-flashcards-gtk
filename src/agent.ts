@@ -139,7 +139,7 @@ Start with the fundamentals and include a mix of:
 
     // Response is already typed as GeneratedFlashcards
     const startId = getNextId(existingCards);
-    return response.cards.map((card, index) => ({
+    return response.cards.map((card: { front: string; back: string }, index: number) => ({
       id: startId + index,
       front: card.front,
       back: card.back,
